@@ -5,6 +5,7 @@
   become_method: sudo       # Set become method
   remote_user: ubuntu         # Update username for remote server
   ignore_unreachable: true
+  ignore_errors: true
   vars:
     tomcat_ver: 9.0.30                          # Tomcat version to install
     ui_manager_user: manager                    # User who can access the UI manager section only
