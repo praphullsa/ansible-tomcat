@@ -1,5 +1,6 @@
 ---
 - name: Tomcat deployment playbook
+  hosts: all
   become: yes               # If to escalate privilege
   become_method: sudo       # Set become method
   remote_user: ubuntu         # Update username for remote server
