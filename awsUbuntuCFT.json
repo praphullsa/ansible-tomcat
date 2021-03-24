@@ -53,18 +53,6 @@
         "SNC::Parameter::Metadata": {
             "KeyName": {
                 "datasource": "ServiceNow::Pools::CloudKeyPairPool.getObjectsByLDC"
-            },
-            "Inventory": {
-                "datasource": "ServiceNow::Pools::AnsibleInventoryPool.FetchInventoryByProvider",
-                "datasourceFilter": {
-                    "WorkloadConfigProvider": "WorkloadConfigProvider"
-                }
-            },
-            "HostGroup": {
-                "datasource": "ServiceNow::Pools::AnsibleInventoryPool.FetchHostGroupByInventory",
-                "datasourceFilter": {
-                    "WorkloadConfigProvider": "WorkloadConfigProvider"
-                }
             }
 
         }
