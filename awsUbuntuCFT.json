@@ -1,0 +1,117 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "AWS Ubuntu 18 LTS w Apache v1.na",
+
+    "Parameters": {
+        "VMname": {
+            "Description": "Enter the name of your Instance",
+            "Type": "String",
+            "MinLength": "3",
+            "MaxLength": "30"
+        },
+        "KeyName": {
+            "Description": "Please enter or select the SSH key you created to connect to Linux Instances ",
+            "Type": "String",
+            "Default": "sbkeypair"
+        },
+        "MySecurityGroup": {
+            "Description": "Please enter the name of your Security Group",
+            "Type": "String",
+            "Default": "sg-1d12eb7d"
+        },
+        "PublicSubnet": {
+            "Description": "Please enter the details for the subnet the instance will be launched in",
+            "Type": "String",
+            "Default": "subnet-d58abfbd"
+        },
+        "WorkloadConfigProvider": {
+            "Description": "Please select the name of the Ansible Tower Server",
+            "Type": "String"
+        },
+        "Credentials": {
+            "Description": "Please select the credentials that will be used to provision the server",
+            "Type": "String"
+        },
+        "HostGroup": {
+            "Description": "Please select the applications host group",
+            "Type": "String"
+        },
+        "Inventory": {
+            "Description": "Please select the inventory for the application",
+            "Type": "String"
+        },
+        "ConfigScript": {
+            "Description": "Please select the configuration script for the application",
+            "Type": "String"
+        }
+    },
+
+    "Metadata": {
+
+        "Comment": "The values for the Parameters NIITKeyPair, NIITComputeProfile, and NIITOSname are populated by Resource Pools in ServiceNow",
+
+        "SNC::Parameter::Metadata": {
+            "KeyName": {
+                "datasource": "ServiceNow::Pools::CloudKeyPairPool.getObjectsByLDC"
+            },
+            "Inventory": {
+                "datasource": "ServiceNow::Pools::AnsibleInventoryPool.FetchInventoryByProvider",
+                "datasourceFilter": {
+                    "WorkloadConfigProvider": "WorkloadConfigProvider"
+                }
+            },
+            "HostGroup": {
+                "datasource": "ServiceNow::Pools::AnsibleInventoryPool.FetchHostGroupByInventory",
+                "datasourceFilter": {
+                    "WorkloadConfigProvider": "WorkloadConfigProvider"
+                }
+            }
+
+        }
+    },
+
+    "Resources": {
+        "MyEC2Instance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "ImageId": "ami-02d55cb47e83a99a0",
+                "InstanceType": "t2.micro",
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "NetworkInterfaces": [{
+                    "AssociatePublicIpAddress": "true",
+                    "DeviceIndex": "0",
+                    "GroupSet": [{
+                        "Ref": "MySecurityGroup"
+                    }],
+                    "SubnetId": {
+                        "Ref": "PublicSubnet"
+                    }
+                }],
+                "Tags": [{
+                    "Key": "Name",
+                    "Value": {
+                        "Ref": "VMname"
+                    }
+                }]
+            }
+
+        }
+    },
+    "Outputs": {
+
+        "AnsibleTomcatIP": {
+            "Description": "IP Address of Ansible Tomcat Host",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    ["http://", {
+                        "Fn::GetAtt": ["MyEC2Instance", "PublicDnsName"]
+                    }, ":8080"]
+                ]
+            }
+        }
+    }
+
+}
